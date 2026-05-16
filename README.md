@@ -23,24 +23,34 @@ This is intentionally smaller than the reference paper. It does not include HuBE
 ## Repository Layout
 
 ```text
+00_check_env.py              Environment check
+01_synthesize_targets.py     Edge-TTS Mandarin target speech generation
 02_extract_units.py          HuBERT feature extraction and K-means unit extraction
-02b_split_data.py            Reproducible TCST train/dev/test split
-05_train.py                  Transformer S2UT training
-06_inference.py              Single-utterance unit prediction
-07_evaluate.py               Greedy Unit-BLEU evaluation
-08_lm_guided_inference.py    Evaluation with one LM weight
-08b_ablation_study.py        LM-weight ablation
-09_synthesize_knn.py         KNN retrieval plus Edge-TTS diagnostic synthesis
-10_verify_case.py            Qualitative consistency report for one example
+03_split_data.py             Reproducible TCST train/dev/test split
+04_check_model.py            Model forward-pass smoke test
+05_check_dataset.py          Dataset smoke test
+06_train.py                  Transformer S2UT training
+07_inference.py              Single-utterance unit prediction
+08_evaluate.py               Greedy Unit-BLEU evaluation
+09_lm_guided_inference.py    Evaluation with one LM weight
+10_ablation_study.py         LM-weight ablation
+11_synthesize_knn.py         KNN retrieval plus Edge-TTS diagnostic synthesis
+12_verify_case.py            Qualitative consistency report for one example
+
 dataset.py                   Dataset and collate logic
 model.py                     S2UT Transformer model
+audio_utils.py               Audio loading helper
+checkpoint_utils.py          Checkpoint loading helper
 s2ut_config.py               K-specific paths and vocabulary config
+
 RESULTS.md                   Final quantitative and qualitative results
 CASE_ANALYSIS.md             Good/bad case analysis procedure
 EXPERIMENT_GUIDE.md          Reproduction notes, including Habra GPU usage
 DEMO.md                      Five-minute showcase walkthrough
 requirements.txt             Python dependencies
 ```
+
+The numbered files are runnable workflow scripts. The unnumbered Python files are support modules imported by those scripts.
 
 Large artifacts are not meant to be committed to GitHub. Raw Tibetan audio, generated Mandarin audio, checkpoints, K-means `.pkl` files, and generated `.wav` files are ignored. The repository keeps code, metadata, split CSVs, and small result summaries so the experiment can be understood and reproduced.
 
@@ -60,7 +70,7 @@ data/test.csv
 Generate Mandarin target speech with Edge-TTS:
 
 ```bash
-python synthesize_tcst_edge_tts.py \
+python 01_synthesize_targets.py \
   --json-path TCST/text.json \
   --out-dir data/TCST/wav_zh
 ```
@@ -81,8 +91,8 @@ python -m pip install -r requirements.txt
 Check the environment:
 
 ```bash
-python test_env.py
-python model.py --num-clusters 100
+python 00_check_env.py
+python 04_check_model.py --num-clusters 100
 ```
 
 ## Reproducing the Main Experiment
@@ -100,20 +110,20 @@ python 02_extract_units.py \
   --batch-size 10000 \
   --force-retrain
 
-python 02b_split_data.py --num-clusters "$K"
-python dataset.py --num-clusters "$K" --batch-size 2
+python 03_split_data.py --num-clusters "$K"
+python 05_check_dataset.py --num-clusters "$K" --batch-size 2
 
-python 05_train.py \
+python 06_train.py \
   --num-clusters "$K" \
   --batch-size 16 \
   --epochs 40 \
   --learning-rate 5e-4
 
-python 07_evaluate.py \
+python 08_evaluate.py \
   --num-clusters "$K" \
   --max-len 600
 
-python 08b_ablation_study.py \
+python 10_ablation_study.py \
   --num-clusters "$K" \
   --max-len 600
 ```
@@ -121,7 +131,7 @@ python 08b_ablation_study.py \
 Save per-example predictions for qualitative analysis:
 
 ```bash
-python 07_evaluate.py \
+python 08_evaluate.py \
   --num-clusters 100 \
   --max-len 600 \
   --save-predictions results/k100_test_predictions.jsonl
@@ -145,7 +155,7 @@ The shallow-fusion result improves over greedy decoding by `+7.40` Unit-BLEU. La
 Run inference for one Tibetan utterance:
 
 ```bash
-python 06_inference.py \
+python 07_inference.py \
   --num-clusters 100 \
   --test-audio ./TCST/wav/Amdo/maqufa/maqufa_002.wav \
   --max-len 600
@@ -154,7 +164,7 @@ python 06_inference.py \
 Then run the retrieval check:
 
 ```bash
-python 10_verify_case.py \
+python 12_verify_case.py \
   --num-clusters 100 \
   --test-audio ./TCST/wav/Amdo/maqufa/maqufa_002.wav \
   --knn-pool train

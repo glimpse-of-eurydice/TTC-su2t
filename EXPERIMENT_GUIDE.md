@@ -16,7 +16,7 @@ python -m pip install -r requirements.txt
 Check that PyTorch and the accelerator are visible:
 
 ```bash
-python test_env.py
+python 00_check_env.py
 python - <<'PY'
 import torch
 print("cuda available:", torch.cuda.is_available())
@@ -45,7 +45,7 @@ data/test.csv
 Raw audio and generated audio are not committed. Generate Mandarin target speech if needed:
 
 ```bash
-python synthesize_tcst_edge_tts.py \
+python 01_synthesize_targets.py \
   --json-path TCST/text.json \
   --out-dir data/TCST/wav_zh
 ```
@@ -61,20 +61,20 @@ python 02_extract_units.py \
   --batch-size 10000 \
   --force-retrain
 
-python 02b_split_data.py --num-clusters "$K"
-python dataset.py --num-clusters "$K" --batch-size 2
+python 03_split_data.py --num-clusters "$K"
+python 05_check_dataset.py --num-clusters "$K" --batch-size 2
 
-python 05_train.py \
+python 06_train.py \
   --num-clusters "$K" \
   --batch-size 16 \
   --epochs 40 \
   --learning-rate 5e-4
 
-python 07_evaluate.py \
+python 08_evaluate.py \
   --num-clusters "$K" \
   --max-len 600
 
-python 08b_ablation_study.py \
+python 10_ablation_study.py \
   --num-clusters "$K" \
   --max-len 600
 ```
@@ -83,7 +83,7 @@ Lower `--batch-size` to `8` or `4` if training runs out of memory.
 
 ## Slurm Array Sketch
 
-Use an array job only after the split CSVs exist, because `02b_split_data.py` writes shared `data/train.csv`, `data/dev.csv`, and `data/test.csv`.
+Use an array job only after the split CSVs exist, because `03_split_data.py` writes shared `data/train.csv`, `data/dev.csv`, and `data/test.csv`.
 
 ```bash
 #!/bin/bash
@@ -105,10 +105,10 @@ K_VALUES=(100 200 500 1000)
 K=${K_VALUES[$SLURM_ARRAY_TASK_ID]}
 
 python 02_extract_units.py --num-clusters "$K" --sample-ratio 0.1 --batch-size 10000 --force-retrain
-python dataset.py --num-clusters "$K" --batch-size 2
-python 05_train.py --num-clusters "$K" --batch-size 16 --epochs 40 --learning-rate 5e-4
-python 07_evaluate.py --num-clusters "$K" --max-len 600
-python 08b_ablation_study.py --num-clusters "$K" --max-len 600
+python 05_check_dataset.py --num-clusters "$K" --batch-size 2
+python 06_train.py --num-clusters "$K" --batch-size 16 --epochs 40 --learning-rate 5e-4
+python 08_evaluate.py --num-clusters "$K" --max-len 600
+python 10_ablation_study.py --num-clusters "$K" --max-len 600
 ```
 
 Submit and monitor:

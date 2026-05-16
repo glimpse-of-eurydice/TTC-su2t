@@ -55,7 +55,7 @@ The K sweep is therefore an honest negative result:
 
 ## Qualitative Evaluation
 
-The repo includes `10_verify_case.py`, which checks a predicted unit sequence by retrieving the closest training unit sequence and comparing Tibetan and Mandarin text.
+The repo includes `12_verify_case.py`, which checks a predicted unit sequence by retrieving the closest training unit sequence and comparing Tibetan and Mandarin text.
 
 One diagnostic failure is:
 
