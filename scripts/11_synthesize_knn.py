@@ -7,6 +7,7 @@ import edge_tts
 import pandas as pd
 from tqdm import tqdm
 
+import _repo_path  # noqa: F401
 from s2ut_config import add_num_clusters_arg, build_experiment_config, ensure_parent_dir
 
 TRAIN_CSV = "./data/train.csv"

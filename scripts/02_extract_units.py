@@ -12,6 +12,7 @@ from tqdm import tqdm
 from transformers import Wav2Vec2FeatureExtractor, HubertModel
 from sklearn.cluster import MiniBatchKMeans
 
+import _repo_path  # noqa: F401
 from audio_utils import load_audio
 from s2ut_config import add_num_clusters_arg, build_experiment_config, ensure_parent_dir
 

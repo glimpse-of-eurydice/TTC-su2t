@@ -4,6 +4,8 @@ import json
 import random
 import pandas as pd
 
+import _repo_path  # noqa: F401
+
 JSON_PATH = "./TCST/text.json"
 WAV_BASE_DIR = "./TCST/wav"
 

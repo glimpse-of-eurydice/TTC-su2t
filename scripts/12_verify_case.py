@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
+import _repo_path  # noqa: F401
 from s2ut_config import add_num_clusters_arg, build_experiment_config
 
 TRAIN_CSV = "./data/train.csv"

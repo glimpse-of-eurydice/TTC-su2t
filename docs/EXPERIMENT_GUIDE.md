@@ -16,7 +16,7 @@ python -m pip install -r requirements.txt
 Check that PyTorch and the accelerator are visible:
 
 ```bash
-python 00_check_env.py
+python scripts/00_check_env.py
 python - <<'PY'
 import torch
 print("cuda available:", torch.cuda.is_available())
@@ -45,7 +45,7 @@ data/test.csv
 Raw audio and generated audio are not committed. Generate Mandarin target speech if needed:
 
 ```bash
-python 01_synthesize_targets.py \
+python scripts/01_synthesize_targets.py \
   --json-path TCST/text.json \
   --out-dir data/TCST/wav_zh
 ```
@@ -55,26 +55,26 @@ python 01_synthesize_targets.py \
 ```bash
 K=100
 
-python 02_extract_units.py \
+python scripts/02_extract_units.py \
   --num-clusters "$K" \
   --sample-ratio 0.1 \
   --batch-size 10000 \
   --force-retrain
 
-python 03_split_data.py --num-clusters "$K"
-python 05_check_dataset.py --num-clusters "$K" --batch-size 2
+python scripts/03_split_data.py --num-clusters "$K"
+python scripts/05_check_dataset.py --num-clusters "$K" --batch-size 2
 
-python 06_train.py \
+python scripts/06_train.py \
   --num-clusters "$K" \
   --batch-size 16 \
   --epochs 40 \
   --learning-rate 5e-4
 
-python 08_evaluate.py \
+python scripts/08_evaluate.py \
   --num-clusters "$K" \
   --max-len 600
 
-python 10_ablation_study.py \
+python scripts/10_ablation_study.py \
   --num-clusters "$K" \
   --max-len 600
 ```
@@ -104,11 +104,11 @@ mkdir -p logs
 K_VALUES=(100 200 500 1000)
 K=${K_VALUES[$SLURM_ARRAY_TASK_ID]}
 
-python 02_extract_units.py --num-clusters "$K" --sample-ratio 0.1 --batch-size 10000 --force-retrain
-python 05_check_dataset.py --num-clusters "$K" --batch-size 2
-python 06_train.py --num-clusters "$K" --batch-size 16 --epochs 40 --learning-rate 5e-4
-python 08_evaluate.py --num-clusters "$K" --max-len 600
-python 10_ablation_study.py --num-clusters "$K" --max-len 600
+python scripts/02_extract_units.py --num-clusters "$K" --sample-ratio 0.1 --batch-size 10000 --force-retrain
+python scripts/05_check_dataset.py --num-clusters "$K" --batch-size 2
+python scripts/06_train.py --num-clusters "$K" --batch-size 16 --epochs 40 --learning-rate 5e-4
+python scripts/08_evaluate.py --num-clusters "$K" --max-len 600
+python scripts/10_ablation_study.py --num-clusters "$K" --max-len 600
 ```
 
 Submit and monitor:

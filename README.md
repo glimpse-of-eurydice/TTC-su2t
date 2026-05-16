@@ -23,19 +23,19 @@ This is intentionally smaller than the reference paper. It does not include HuBE
 ## Repository Layout
 
 ```text
-00_check_env.py              Environment check
-01_synthesize_targets.py     Edge-TTS Mandarin target speech generation
-02_extract_units.py          HuBERT feature extraction and K-means unit extraction
-03_split_data.py             Reproducible TCST train/dev/test split
-04_check_model.py            Model forward-pass smoke test
-05_check_dataset.py          Dataset smoke test
-06_train.py                  Transformer S2UT training
-07_inference.py              Single-utterance unit prediction
-08_evaluate.py               Greedy Unit-BLEU evaluation
-09_lm_guided_inference.py    Evaluation with one LM weight
-10_ablation_study.py         LM-weight ablation
-11_synthesize_knn.py         KNN retrieval plus Edge-TTS diagnostic synthesis
-12_verify_case.py            Qualitative consistency report for one example
+scripts/00_check_env.py              Environment check
+scripts/01_synthesize_targets.py     Edge-TTS Mandarin target speech generation
+scripts/02_extract_units.py          HuBERT feature extraction and K-means unit extraction
+scripts/03_split_data.py             Reproducible TCST train/dev/test split
+scripts/04_check_model.py            Model forward-pass smoke test
+scripts/05_check_dataset.py          Dataset smoke test
+scripts/06_train.py                  Transformer S2UT training
+scripts/07_inference.py              Single-utterance unit prediction
+scripts/08_evaluate.py               Greedy Unit-BLEU evaluation
+scripts/09_lm_guided_inference.py    Evaluation with one LM weight
+scripts/10_ablation_study.py         LM-weight ablation
+scripts/11_synthesize_knn.py         KNN retrieval plus Edge-TTS diagnostic synthesis
+scripts/12_verify_case.py            Qualitative consistency report for one example
 
 dataset.py                   Dataset and collate logic
 model.py                     S2UT Transformer model
@@ -43,10 +43,11 @@ audio_utils.py               Audio loading helper
 checkpoint_utils.py          Checkpoint loading helper
 s2ut_config.py               K-specific paths and vocabulary config
 
-RESULTS.md                   Final quantitative and qualitative results
-CASE_ANALYSIS.md             Good/bad case analysis procedure
-EXPERIMENT_GUIDE.md          Reproduction notes, including Habra GPU usage
-DEMO.md                      Five-minute showcase walkthrough
+docs/RESULTS.md             Final quantitative and qualitative results
+docs/CASE_ANALYSIS.md       Good/bad case analysis procedure
+docs/EXPERIMENT_GUIDE.md    Reproduction notes, including Habra GPU usage
+docs/DEMO.md                Five-minute showcase walkthrough
+results/                    Small CSV, JSON, and plot outputs
 requirements.txt             Python dependencies
 ```
 
@@ -70,7 +71,7 @@ data/test.csv
 Generate Mandarin target speech with Edge-TTS:
 
 ```bash
-python 01_synthesize_targets.py \
+python scripts/01_synthesize_targets.py \
   --json-path TCST/text.json \
   --out-dir data/TCST/wav_zh
 ```
@@ -91,8 +92,8 @@ python -m pip install -r requirements.txt
 Check the environment:
 
 ```bash
-python 00_check_env.py
-python 04_check_model.py --num-clusters 100
+python scripts/00_check_env.py
+python scripts/04_check_model.py --num-clusters 100
 ```
 
 ## Reproducing the Main Experiment
@@ -104,26 +105,26 @@ Run one K setting:
 ```bash
 K=100
 
-python 02_extract_units.py \
+python scripts/02_extract_units.py \
   --num-clusters "$K" \
   --sample-ratio 0.1 \
   --batch-size 10000 \
   --force-retrain
 
-python 03_split_data.py --num-clusters "$K"
-python 05_check_dataset.py --num-clusters "$K" --batch-size 2
+python scripts/03_split_data.py --num-clusters "$K"
+python scripts/05_check_dataset.py --num-clusters "$K" --batch-size 2
 
-python 06_train.py \
+python scripts/06_train.py \
   --num-clusters "$K" \
   --batch-size 16 \
   --epochs 40 \
   --learning-rate 5e-4
 
-python 08_evaluate.py \
+python scripts/08_evaluate.py \
   --num-clusters "$K" \
   --max-len 600
 
-python 10_ablation_study.py \
+python scripts/10_ablation_study.py \
   --num-clusters "$K" \
   --max-len 600
 ```
@@ -131,13 +132,13 @@ python 10_ablation_study.py \
 Save per-example predictions for qualitative analysis:
 
 ```bash
-python 08_evaluate.py \
+python scripts/08_evaluate.py \
   --num-clusters 100 \
   --max-len 600 \
   --save-predictions results/k100_test_predictions.jsonl
 ```
 
-GPU-cluster notes are in [EXPERIMENT_GUIDE.md](EXPERIMENT_GUIDE.md).
+GPU-cluster notes are in [docs/EXPERIMENT_GUIDE.md](docs/EXPERIMENT_GUIDE.md).
 
 ## Final Result
 
@@ -148,14 +149,14 @@ The selected system uses `K=100`, matching the reference paper's reported HuBERT
 | Greedy S2UT baseline | 0.0 | 12.10 |
 | Best LM-guided decoding | 0.6 | 19.50 |
 
-The shallow-fusion result improves over greedy decoding by `+7.40` Unit-BLEU. Larger K values did not help in this small setup, which is a useful negative result. Details are in [RESULTS.md](RESULTS.md).
+The shallow-fusion result improves over greedy decoding by `+7.40` Unit-BLEU. Larger K values did not help in this small setup, which is a useful negative result. Details are in [docs/RESULTS.md](docs/RESULTS.md).
 
 ## Qualitative Diagnostic
 
 Run inference for one Tibetan utterance:
 
 ```bash
-python 07_inference.py \
+python scripts/07_inference.py \
   --num-clusters 100 \
   --test-audio ./TCST/wav/Amdo/maqufa/maqufa_002.wav \
   --max-len 600
@@ -164,7 +165,7 @@ python 07_inference.py \
 Then run the retrieval check:
 
 ```bash
-python 12_verify_case.py \
+python scripts/12_verify_case.py \
   --num-clusters 100 \
   --test-audio ./TCST/wav/Amdo/maqufa/maqufa_002.wav \
   --knn-pool train

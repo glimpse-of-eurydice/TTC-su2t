@@ -77,8 +77,8 @@ def build_experiment_config(num_clusters: int | None = None) -> ExperimentConfig
         ),
         predicted_units_path=_legacy_or_suffix_path(
             resolved_num_clusters,
-            "./predicted_units.json",
-            "./predicted_units_k{k}.json",
+            "./results/predicted_units.json",
+            "./results/predicted_units_k{k}.json",
         ),
         output_audio_path=_legacy_or_suffix_path(
             resolved_num_clusters,
@@ -87,18 +87,18 @@ def build_experiment_config(num_clusters: int | None = None) -> ExperimentConfig
         ),
         ablation_results_path=_legacy_or_suffix_path(
             resolved_num_clusters,
-            "./ablation_results.csv",
-            "./ablation_results_k{k}.csv",
+            "./results/ablation_results.csv",
+            "./results/ablation_results_k{k}.csv",
         ),
         ablation_plot_path=_legacy_or_suffix_path(
             resolved_num_clusters,
-            "./lm_weight_ablation.png",
-            "./lm_weight_ablation_k{k}.png",
+            "./results/lm_weight_ablation.png",
+            "./results/lm_weight_ablation_k{k}.png",
         ),
         verify_report_path=_legacy_or_suffix_path(
             resolved_num_clusters,
-            "./verify_report.json",
-            "./verify_report_k{k}.json",
+            "./results/verify_report.json",
+            "./results/verify_report_k{k}.json",
         ),
     )
 

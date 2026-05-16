@@ -1,6 +1,6 @@
 # Five-Minute Showcase Walkthrough and Speaker Notes
 
-Use this as a repo walkthrough, not as slides. Keep the GitHub repository open and move between `README.md`, `RESULTS.md`, `CASE_ANALYSIS.md`, and `.gitignore`.
+Use this as a repo walkthrough, not as slides. Keep the GitHub repository open and move between `README.md`, `docs/RESULTS.md`, `docs/CASE_ANALYSIS.md`, and `.gitignore`.
 
 ## 0:00-0:45 Problem
 
@@ -20,7 +20,7 @@ Speaker notes:
 
 > The main technical inspiration is Gong, Xu, and Zhao 2025, who study Tibetan-Chinese speech-to-speech translation with discrete units. I did not reproduce their full system. Instead, I built a smaller course-scale version focused on the core idea: target-side discrete units, S2UT training, and honest evaluation.
 >
-> The workflow is numbered in the repo. `01_synthesize_targets.py` creates Mandarin target speech from TCST Chinese text. `02_extract_units.py` extracts HuBERT layer-6 features and clusters them into target units. `06_train.py` trains a Transformer speech-to-unit model from Tibetan speech features to Mandarin units. `08_evaluate.py` computes Unit-BLEU, `10_ablation_study.py` tests LM shallow fusion, and `12_verify_case.py` checks qualitative consistency.
+> The workflow is numbered under `scripts/`. `01_synthesize_targets.py` creates Mandarin target speech from TCST Chinese text. `02_extract_units.py` extracts HuBERT layer-6 features and clusters them into target units. `06_train.py` trains a Transformer speech-to-unit model from Tibetan speech features to Mandarin units. `08_evaluate.py` computes Unit-BLEU, `10_ablation_study.py` tests LM shallow fusion, and `12_verify_case.py` checks qualitative consistency.
 
 Quick walkthrough list:
 
@@ -34,7 +34,7 @@ Quick walkthrough list:
 
 ## 1:45-2:45 Result
 
-Show: `RESULTS.md`.
+Show: `docs/RESULTS.md`.
 
 Speaker notes:
 
@@ -52,7 +52,7 @@ Unit-BLEU = 19.50
 
 ## 2:45-3:45 Qualitative Failure
 
-Show: `CASE_ANALYSIS.md`.
+Show: `docs/CASE_ANALYSIS.md`.
 
 Speaker notes:
 
@@ -70,7 +70,7 @@ Retrieved Mandarin: 今天有人买牙膏吗？
 
 ## 3:45-4:30 Reproducibility
 
-Show: `.gitignore`, `requirements.txt`, `EXPERIMENT_GUIDE.md`, and `data/`.
+Show: `.gitignore`, `requirements.txt`, `docs/EXPERIMENT_GUIDE.md`, and `data/`.
 
 Speaker notes:
 
@@ -81,14 +81,14 @@ Speaker notes:
 Point to:
 
 - `requirements.txt`
-- `EXPERIMENT_GUIDE.md`
+- `docs/EXPERIMENT_GUIDE.md`
 - split CSVs in `data/`
-- result files such as `ablation_results*.csv`
+- result files such as `results/ablation_results*.csv`
 - ignored large artifacts in `.gitignore`
 
 ## 4:30-5:00 Takeaway
 
-Show: final paragraph of `README.md` or `RESULTS.md`.
+Show: final paragraph of `README.md` or `docs/RESULTS.md`.
 
 Speaker notes:
 

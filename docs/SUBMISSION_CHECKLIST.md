@@ -16,17 +16,17 @@ Keep:
 
 ```text
 README.md
-RESULTS.md
-CASE_ANALYSIS.md
-EXPERIMENT_GUIDE.md
-DEMO.md
+docs/RESULTS.md
+docs/CASE_ANALYSIS.md
+docs/EXPERIMENT_GUIDE.md
+docs/DEMO.md
 LICENSE
 requirements.txt
 *.py
-ablation_results*.csv
-predicted_units*.json
-verify_report*.json
-lm_weight_ablation.png
+results/ablation_results*.csv
+results/predicted_units*.json
+results/verify_report*.json
+results/lm_weight_ablation.png
 TCST/text.json
 data/train.csv
 data/dev.csv
@@ -51,9 +51,9 @@ __pycache__/
 ## Final Checks
 
 ```bash
-python 00_check_env.py
-python 04_check_model.py --num-clusters 100
-python 05_check_dataset.py --num-clusters 100 --batch-size 2
+python scripts/00_check_env.py
+python scripts/04_check_model.py --num-clusters 100
+python scripts/05_check_dataset.py --num-clusters 100 --batch-size 2
 
 git status --short
 git check-ignore -v checkpoints/best_s2ut_model.pth
@@ -64,8 +64,8 @@ git check-ignore -v data/TCST/wav_zh
 If the checkpoint and audio are present locally:
 
 ```bash
-python 08_evaluate.py --num-clusters 100 --max-len 600
-python 12_verify_case.py --num-clusters 100 --knn-pool train
+python scripts/08_evaluate.py --num-clusters 100 --max-len 600
+python scripts/12_verify_case.py --num-clusters 100 --knn-pool train
 ```
 
 ## Showcase Story

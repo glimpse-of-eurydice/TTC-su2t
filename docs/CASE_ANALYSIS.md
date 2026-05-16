@@ -7,7 +7,7 @@ Unit-BLEU is useful for comparing unit-prediction settings, but it does not prov
 After reproducing the final `K=100` checkpoint, run:
 
 ```bash
-python 08_evaluate.py \
+python scripts/08_evaluate.py \
   --num-clusters 100 \
   --max-len 600 \
   --save-predictions results/k100_test_predictions.jsonl
@@ -65,18 +65,18 @@ PY
 For a selected test sample:
 
 ```bash
-python 07_inference.py \
+python scripts/07_inference.py \
   --num-clusters 100 \
   --test-audio /path/to/selected/audio.wav \
   --max-len 600 \
-  --output-json predicted_units_case.json
+  --output-json results/predicted_units_case.json
 
-python 12_verify_case.py \
+python scripts/12_verify_case.py \
   --num-clusters 100 \
-  --predicted-units predicted_units_case.json \
+  --predicted-units results/predicted_units_case.json \
   --test-audio /path/to/selected/audio.wav \
   --knn-pool train \
-  --save-report verify_report_case.json
+  --save-report results/verify_report_case.json
 ```
 
 ## How to Interpret the Cases

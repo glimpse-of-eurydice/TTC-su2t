@@ -8,6 +8,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+import _repo_path  # noqa: F401
 from dataset import S2UTDataset, make_collate_fn
 from model import S2UTModel
 from s2ut_config import add_num_clusters_arg, build_experiment_config, ensure_parent_dir

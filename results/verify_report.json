@@ -1,6 +1,6 @@
 {
   "num_clusters": 100,
-  "predicted_units_path": "./predicted_units.json",
+  "predicted_units_path": "./results/predicted_units.json",
   "predicted_units_key": "test_audio",
   "predicted_units_length": 67,
   "units_json_path": "./data/TCST/target_units.json",

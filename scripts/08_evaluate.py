@@ -8,6 +8,7 @@ import torch
 import torchaudio
 from tqdm import tqdm
 
+import _repo_path  # noqa: F401
 from audio_utils import load_audio
 from checkpoint_utils import load_checkpoint_into_model
 from model import S2UTModel

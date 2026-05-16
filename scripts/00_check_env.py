@@ -1,3 +1,4 @@
+import _repo_path  # noqa: F401
 import torch
 import torchaudio
 import transformers

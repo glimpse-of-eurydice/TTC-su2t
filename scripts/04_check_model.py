@@ -2,6 +2,7 @@ import argparse
 
 import torch
 
+import _repo_path  # noqa: F401
 from model import S2UTModel
 from s2ut_config import add_num_clusters_arg, build_experiment_config
 
