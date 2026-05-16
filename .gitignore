@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# OS / editor
+.DS_Store
+.vscode/
+s2ut.code-workspace
+
+# Large datasets and generated audio
+TCST/wav/
+data/TCST/wav_zh/
+data/TCST/wav_zh_errors.log
+*.wav
+
+# Large model artifacts
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+*.pkl
+TCST/target_units*.json
+
+# Runtime logs
+logs/
+*.log
+*.out
+*.err
+
+# LaTeX build intermediates
+*.aux
+*.nav
+*.snm
+*.toc
+*.vrb
+*.fls
+*.fdb_latexmk
+missfont.log
+presentation_s2ut/preview/
+presentation_s2ut/
+
+# Optional generated plots/results can be committed selectively.
