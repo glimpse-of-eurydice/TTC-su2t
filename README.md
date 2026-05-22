@@ -226,25 +226,22 @@ Unit-BLEU is useful, but it is not semantic evaluation. A unit sequence can over
 
 The diagnostic takes a predicted Mandarin unit sequence, finds the nearest training unit sequence by Levenshtein edit distance, and compares the retrieved Tibetan and Mandarin text. This is deliberately conservative: if the retrieved text is semantically unrelated, the model should not be presented as successful just because it produced units.
 
-### Main K=100 Cautionary Example
+### K=100 Failure Cases Despite the Best Unit-BLEU
 
-The clearest current failure is:
+The most important caution is that the strongest aggregate setting, `K=100`, still fails on individual utterances. These examples were generated with the K=100 checkpoint and checked through the KNN retrieval diagnostic. Three of the held-out test examples below produce the same predicted unit length and retrieve the same unrelated training sentence, which suggests that the model can collapse toward a locally plausible unit pattern instead of preserving the source meaning.
 
-| Field | Value |
-|---|---|
-| Query sample | `maqufa-002` |
-| Query split | train |
-| Predicted unit length | 67 |
-| Unit edit distance to retrieved sample | 36 |
-| Reference Mandarin | 不断加大高水平对外开放力度， |
-| Retrieved Mandarin | 今天有人买牙膏吗？ |
-| Interpretation | The pipeline produces a unit sequence and retrieves fluent Mandarin text, but the meaning is wrong. |
+| Query sample | Split | Reference Mandarin | Retrieved Mandarin | Pred. unit length | Unit edit distance | Interpretation |
+|---|---|---|---|---:|---:|---|
+| `maqufa-002` | train | 不断加大高水平对外开放力度， | 今天有人买牙膏吗？ | 67 | 36 | Fluent retrieved Mandarin, but completely wrong meaning. |
+| `maqufb-038` | test | 不计算住院次数，采用公共住院全年统计量线。 | 香港特区政府发言人说， | 148 | 97 | A health/administration sentence is mapped to an unrelated political-news phrase. |
+| `bodkb-200` | test | 去看电影吗 | 香港特区政府发言人说， | 148 | 97 | A short everyday question is mapped to the same unrelated phrase. |
+| `L_F_0_02_235` | test | 加大对三滇藏区的支持力度。 | 香港特区政府发言人说， | 148 | 97 | A public-policy sentence is again mapped to the same unrelated phrase. |
 
-This example is useful precisely because it fails. It separates "generating something Mandarin-like" from "preserving the source meaning."
+This is the core evaluation lesson. `K=100` gives the best aggregate Unit-BLEU in this repo, but that does not mean the model is usable for the target user. A patient, receptionist, or doctor would not benefit from a system that produces a fluent Mandarin sentence with the wrong content. The failure is not just a decoding inconvenience; it is an access and safety issue.
 
 ### Retrieval Diagnostics Across Unit Inventories
 
-The following examples all use the same query utterance (`maqufa-002`) but different K-means unit inventories. They are not independent held-out test examples; they are diagnostic checks showing how retrieval behavior changes across unit spaces.
+The following examples keep the original `maqufa-002` query fixed and vary only the K-means unit inventory. They are not independent held-out test examples; they are diagnostic checks showing how retrieval behavior changes across unit spaces.
 
 | K | Predicted unit length | Retrieved sample | Retrieved Mandarin | Consistent? |
 |---:|---:|---|---|---|
