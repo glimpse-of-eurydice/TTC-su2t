@@ -52,24 +52,9 @@ This reframes the task. The source side remains speech. The target side becomes 
 
 ## Pipeline
 
-```mermaid
-flowchart TD
-    A[TCST Tibetan source speech] --> B[80-dim log-Mel filterbank features]
-    T[TCST Chinese text metadata] --> C[Edge-TTS Mandarin target speech]
-    C --> D[HuBERT base layer-6 features]
-    D --> E[MiniBatch K-means target units]
-    E --> F[Reduced unit sequences]
-    B --> G[Transformer S2UT model]
-    F --> G
-    F --> H[3-gram unit language model]
-    G --> I[Greedy / shallow-fusion decoding]
-    H --> I
-    I --> J[Predicted Mandarin unit sequence]
-    J --> K[Unit-BLEU evaluation]
-    J --> L[KNN retrieval diagnostic]
-    L --> M[Retrieved Mandarin text]
-    M --> N[Edge-TTS diagnostic audio]
-```
+![Tibetan-to-Mandarin speech-to-unit translation pipeline](docs/assets/s2ut_pipeline.svg)
+
+The figure shows the main design choice of the project: the model is trained from Tibetan source-speech features to Mandarin acoustic unit sequences, while the target units are built from Mandarin-side synthetic speech and HuBERT features.
 
 The implementation is intentionally smaller than the reference paper. It does not include HuBERT fine-tuning, auxiliary ASR/ST/CTC objectives, Fairseq recipes, or a trained unit vocoder. The point is to build a complete prototype that can be inspected and evaluated under realistic course constraints.
 
