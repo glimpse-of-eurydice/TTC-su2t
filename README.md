@@ -169,17 +169,19 @@ The shallow-fusion result improves over greedy decoding by `+7.40` Unit-BLEU.
 
 ![K=100 LM weight ablation](results/lm_weight_ablation.png)
 
-### How I Interpret the Score
+### ## How I Interpret the Score
 
-I treat `19.50` Unit-BLEU as a measurable improvement within this repo, not as high-quality translation. BLEU-style scores do not have a universal quality threshold, and Unit-BLEU is even harder to interpret because it measures overlap between discrete acoustic unit sequences rather than words or meanings. A score near `20` says that the K=100 + LM setting has learned more target-unit regularity than the greedy baseline and the larger K settings. It does not say that the predicted Mandarin content is correct.
+I treat `19.50` Unit-BLEU as a measurable improvement within this repo, not as evidence of high-quality translation. BLEU-style scores do not have a universal quality threshold, and Unit-BLEU is even harder to interpret because it measures overlap between discrete acoustic unit sequences rather than words or meanings.
 
-That distinction matters for this project. The quantitative result is useful because it shows that the speech-to-unit pipeline can be trained and improved under limited resources. The qualitative analysis below is equally important because it shows why the same number is not enough for real use. In a medical-access setting, a locally fluent but semantically wrong Mandarin output is still a failure.
+A score near `20` suggests that the `K=100` + LM setting has learned more target-unit regularity than the greedy baseline and the larger-K settings tested in this repo. It does not mean that the predicted Mandarin content is semantically correct.
+
+That distinction matters for this project. The quantitative result is useful because it shows that the speech-to-unit pipeline can be trained and improved under limited resources. The qualitative analysis below is equally important because it shows why the same number is not enough for real use. In a medical-access setting, a locally plausible but semantically wrong Mandarin output is still a failure.
 
 ## Qualitative Analysis
 
-Unit-BLEU is useful, but it is not semantic evaluation. A unit sequence can overlap with the reference more than another sequence while still failing to preserve meaning. For that reason, I want to include a retrieval diagnostic.
+Unit-BLEU is useful, but it is not semantic evaluation. A unit sequence can overlap with the reference more than another sequence while still failing to preserve meaning. For that reason, the retrieval diagnostics are necessary: they show that the model can obtain the best Unit-BLEU configuration while still mapping a test utterance toward Mandarin content that is semantically unrelated to the Tibetan source.
 
-The diagnostic takes a predicted Mandarin unit sequence, finds the nearest training unit sequence by Levenshtein edit distance, and compares the retrieved Tibetan and Mandarin text. This is deliberately conservative: if the retrieved text is semantically unrelated, the model should not be presented as successful just because it produced units.
+The diagnostic takes a predicted Mandarin unit sequence, finds the nearest training unit sequence by Levenshtein edit distance, and compares the retrieved Tibetan and Mandarin text. This is deliberately conservative: if the retrieved text is semantically unrelated, the model should not be presented as successful just because it produced a plausible unit sequence.
 
 ### K=100 Failure Cases Despite the Best Unit-BLEU
 
