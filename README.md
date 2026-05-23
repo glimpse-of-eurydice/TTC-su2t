@@ -1,20 +1,20 @@
 # Tibetan-to-Mandarin Speech-to-Unit Translation Prototype
 
-This repository documents and implements a course-scale prototype for Tibetan-to-Mandarin speech translation using discrete speech units. The project asks a narrow question: can Tibetan source speech be mapped toward Mandarin-side acoustic units without first requiring a complete Tibetan automatic speech recognition system?
+In this project, I ask a narrow question: can Tibetan source speech be mapped toward Mandarin-side acoustic units without first requiring a complete Tibetan automatic speech recognition system?
 
-The short answer is: partly. The system is a working, inspectable prototype. It builds data, extracts target-side units, trains a Transformer speech-to-unit model, evaluates unit predictions, and runs qualitative retrieval diagnostics. It also fails in important ways. Those failures are part of the contribution, because a low-resource language technology project should be explicit about where its outputs are not safe to use.
+The short answer is: partly. The system is a working, inspectable prototype. It builds data, extracts target-side units, trains a Transformer speech-to-unit model, evaluates unit predictions, and runs qualitative retrieval diagnostics. It also fails in important ways: even when the score looks acceptable, the model actually would fail to provide support real users. 
 
 The main technical inspiration is Gong, Xu, and Zhao (2025), *Tibetan-Chinese speech-to-speech translation based on discrete units*: https://www.nature.com/articles/s41598-025-85782-w
 
-## A Motivating Scene
+## Motivation
 
-Imagine an elderly Tibetan speaker from a remote pastoral area traveling to a large hospital in Chengdu. The hospital staff mostly speak Mandarin. The patient may be able to describe pain, medication history, or symptoms in Tibetan, but the clinical interaction depends on a Mandarin-speaking system: reception, triage, payment, diagnosis, and follow-up instructions.
+Imagine an elderly Tibetan speaker from a remote pastoral area traveling to a large hospital in Chengdu. The hospital staff mostly speaks Mandarin. The patient may be able to describe pain, medication history, or symptoms in Tibetan, but the clinical interaction depends on a Mandarin-speaking system: reception, triage, payment, diagnosis, and follow-up instructions.
 
 This is not just a benchmark problem. It is an access problem. Speech technology can either reduce or intensify the distance between a marginalized speaker and a public service. A translation system in this setting must therefore be evaluated honestly. A fluent Mandarin sentence is not enough if it does not preserve the meaning of the Tibetan speech.
 
-This repo should be read in that spirit. It is not a deployable medical interpreter. It is a small intervention that tests one idea: avoiding a fragile Tibetan text bottleneck by predicting Mandarin-side speech units.
+I therefore do not present this as a deployable medical interpreter. It is not a deployable medical interpreter. It is a small intervention that tests one idea: avoiding a fragile Tibetan text bottleneck by predicting Mandarin-side speech units.
 
-## Why the Standard ASR-to-MT-to-TTS Pipeline Is Fragile Here
+## Why the Standard ASR-to-MT-to-TTS Pipeline Is Fragile
 
 A conventional speech translation system usually works as a cascade:
 
@@ -24,13 +24,15 @@ source speech -> ASR text -> machine translation text -> target speech
 
 This architecture is attractive because each component can be trained and evaluated separately. But in a low-resource Tibetan-to-Mandarin setting, every stage can become brittle.
 
-First, the pipeline depends on reliable Tibetan ASR. That is difficult when there is limited transcribed speech, dialectal diversity, and a mismatch between spoken forms and standardized written forms. Errors at the ASR stage then propagate into translation and speech synthesis.
+First, the pipeline depends on reliable Tibetan ASR. That is difficult when there is  dialectal diversity, limited transcribed speech, and a mismatch between spoken forms and standardized written forms. Errors at the ASR stage then propagate into translation and speech synthesis.
 
-Second, the writing system itself makes the text bridge more complex than a simple character stream. Tibetan is written with syllable structures that combine base letters, prefixes, suffixes, superscribed/subscribed forms, vowel signs, and delimiters. The practical challenge is not "Unicode encoding" in isolation. Unicode can represent Tibetan text, just as it can represent Korean Hangul syllables. The difficulty is that ASR and downstream NLP systems need stable normalization, tokenization, and spoken-to-written alignment. In a better-resourced language, those conventions are often supported by large corpora and mature tools. In this project setting, they are much thinner.
+Second, the writing system itself makes the text bridge more complex than a simple character stream. Tibetan is written in syllable units that may combine base letters, prefixes, suffixes, superscribed and subscribed consonants, vowel signs, and syllable delimiters. The practical challenge is not that Unicode cannot represent Tibetan text. It can. Rather, Tibetan text is typically encoded as sequences of letters and combining signs that must be rendered and processed as syllable stacks or grapheme clusters. This differs from modern Korean Hangul, where many commonly used syllable blocks have precomposed Unicode code points and mature normalization support. For Tibetan ASR and downstream NLP, the difficult part is obtaining stable conventions for normalization, tokenization, syllable segmentation, and spoken-to-written alignment. In better-resourced languages, these conventions are often supported by large corpora and mature tools. In this project setting, they are much thinner.
 
-Korean Hangul is a useful contrast only if used carefully. Hangul syllables are also compositional, but modern NLP tooling usually has strong normalization, segmentation, and data support for Korean. Tibetan speech technology has fewer such resources, and the path from acoustic realization to standardized written Tibetan can be less supported in practice. That makes an ASR-first cascade a risky dependency.
+Hangul is also compositional, but modern Korean NLP usually benefits from stronger normalization, segmentation, and data support. Tibetan speech technology has fewer such resources, and the path from acoustic realization to standardized written Tibetan is less supported in practice. This makes an ASR-first cascade a risky dependency.
 
-Third, even if Tibetan ASR were available, a full speech-to-speech system would still need target-side speech generation. Unit-based speech-to-speech translation systems often train a unit vocoder to convert predicted acoustic units into waveforms. That is a separate data and compute burden. For a six-week course project, a smaller and more honest prototype is preferable to an overclaimed full system.
+![Writing-system examples for Latin, Hangul, and Tibetan](docs/assets/writing_system_examples.svg)
+
+Third, even if Tibetan ASR were available, a full speech-to-speech system would still need target-side speech generation. Unit-based speech-to-speech translation systems often train a unit vocoder to convert predicted acoustic units into waveforms. That is a separate data and compute burden. For a course project, a smaller prototype is more preferable to an overclaimed full system.
 
 ## Core Idea: Translate Speech Into Units, Not Tibetan Text
 
@@ -56,51 +58,13 @@ This reframes the task. The source side remains speech. The target side becomes 
 
 The figure shows the main design choice of the project: the model is trained from Tibetan source-speech features to Mandarin acoustic unit sequences, while the target units are built from Mandarin-side synthetic speech and HuBERT features.
 
-The implementation is intentionally smaller than the reference paper. It does not include HuBERT fine-tuning, auxiliary ASR/ST/CTC objectives, Fairseq recipes, or a trained unit vocoder. The point is to build a complete prototype that can be inspected and evaluated under realistic course constraints.
+The implementation is intentionally smaller than the reference paper. I do not reproduce the full Fairseq-based training recipe, HuBERT fine-tuning, auxiliary ASR/ST/CTC objectives, or a trained unit vocoder, since these components require substantially more engineering time, GPU memory, and speech-generation infrastructure than was available for this prototype; most development and debugging were done on a 16GB MacBook Air, with limited access to larger compute.
 
-## What Is Implemented
-
-The runnable workflow is organized under `scripts/`:
-
-```text
-scripts/00_check_env.py              Environment check
-scripts/01_synthesize_targets.py     Edge-TTS Mandarin target speech generation
-scripts/02_extract_units.py          HuBERT feature extraction and K-means unit extraction
-scripts/03_split_data.py             Reproducible TCST train/dev/test split
-scripts/04_check_model.py            Model forward-pass smoke test
-scripts/05_check_dataset.py          Dataset smoke test
-scripts/06_train.py                  Transformer S2UT training
-scripts/07_inference.py              Single-utterance unit prediction
-scripts/08_evaluate.py               Greedy Unit-BLEU evaluation
-scripts/09_lm_guided_inference.py    Evaluation with one LM weight
-scripts/10_ablation_study.py         LM-weight ablation
-scripts/11_synthesize_knn.py         KNN retrieval plus Edge-TTS diagnostic synthesis
-scripts/12_verify_case.py            Qualitative consistency report
-```
-
-Support modules stay at the repository root:
-
-```text
-dataset.py              Dataset and collate logic
-model.py                Transformer S2UT model
-audio_utils.py          Audio loading helper
-checkpoint_utils.py     Checkpoint loading helper
-s2ut_config.py          K-specific paths and vocabulary config
-```
-
-Supporting documents and outputs:
-
-```text
-docs/RESULTS.md             Short result summary
-docs/CASE_ANALYSIS.md       Case-analysis workflow
-docs/EXPERIMENT_GUIDE.md    Reproduction and Habra GPU notes
-docs/DEMO.md                Five-minute showcase notes
-results/                    Small CSV, JSON, and plot outputs
-```
-
-Large artifacts are intentionally not committed: raw Tibetan audio, generated Mandarin audio, checkpoints, K-means `.pkl` files, and generated `.wav` files. The repo keeps code, metadata, split CSVs, target units for K=100, and small result summaries.
+Instead, the contribution of this project is a lightweight and inspectable adaptation of the speech-to-unit idea. It keeps the central design choice of avoiding a Tibetan text bottleneck, but replaces the full end-to-end speech-to-speech system with a reproducible pipeline: Mandarin target speech synthesis, HuBERT-based unit extraction, K-means unit inventories, a compact Transformer S2UT model, unit-level LM decoding, K/LM-weight ablations, and retrieval-based qualitative diagnostics. The goal is not to claim parity with the reference paper, but to show what can be built, tested, and critically evaluated under constrained compute.
 
 ## Data Construction
+
+This project uses the Tibetan-Chinese Speech Translation corpus (TCST) as the source dataset: https://www.scidb.cn/en/detail?dataSetId=381faff3e8cf4991a0ab2ca669b2444d.
 
 The TCST metadata provides Tibetan source speech and Tibetan/Chinese text fields, but this S2UT prototype needs Mandarin target speech in order to extract target acoustic units. I therefore synthesize Mandarin speech from the Chinese text with Edge-TTS:
 
@@ -158,7 +122,7 @@ The sequence model is a compact Transformer encoder-decoder:
 
 ## Decoding: Why Add a Tiny Unit Language Model?
 
-Low-resource autoregressive decoding is unstable. The model may choose locally plausible but globally poor unit continuations. To regularize the output, this repo builds a count-based 3-gram language model over target-side unit sequences.
+Low-resource autoregressive decoding is unstable. The model may choose locally plausible but globally poor unit continuations. To regularize the output, I built a count-based 3-gram language model over target-side unit sequences.
 
 During shallow fusion, the next-unit probability is interpolated:
 
@@ -205,9 +169,15 @@ The shallow-fusion result improves over greedy decoding by `+7.40` Unit-BLEU.
 
 ![K=100 LM weight ablation](results/lm_weight_ablation.png)
 
+### How I Interpret the Score
+
+I treat `19.50` Unit-BLEU as a measurable improvement within this repo, not as high-quality translation. BLEU-style scores do not have a universal quality threshold, and Unit-BLEU is even harder to interpret because it measures overlap between discrete acoustic unit sequences rather than words or meanings. A score near `20` says that the K=100 + LM setting has learned more target-unit regularity than the greedy baseline and the larger K settings. It does not say that the predicted Mandarin content is correct.
+
+That distinction matters for this project. The quantitative result is useful because it shows that the speech-to-unit pipeline can be trained and improved under limited resources. The qualitative analysis below is equally important because it shows why the same number is not enough for real use. In a medical-access setting, a locally fluent but semantically wrong Mandarin output is still a failure.
+
 ## Qualitative Analysis
 
-Unit-BLEU is useful, but it is not semantic evaluation. A unit sequence can overlap with the reference more than another sequence while still failing to preserve meaning. For that reason, this repo includes a retrieval diagnostic.
+Unit-BLEU is useful, but it is not semantic evaluation. A unit sequence can overlap with the reference more than another sequence while still failing to preserve meaning. For that reason, I want to include a retrieval diagnostic.
 
 The diagnostic takes a predicted Mandarin unit sequence, finds the nearest training unit sequence by Levenshtein edit distance, and compares the retrieved Tibetan and Mandarin text. This is deliberately conservative: if the retrieved text is semantically unrelated, the model should not be presented as successful just because it produced units.
 
@@ -237,18 +207,7 @@ The following examples keep the original `maqufa-002` query fixed and vary only 
 
 This table is not meant to say that K=100 is uniquely bad or that K=1000 is semantically reliable. It shows a broader limitation: nearest-neighbor retrieval over predicted unit sequences can produce fluent, plausible-looking Mandarin while drifting away from the source meaning.
 
-### How to Generate a Full Good/Bad Case Audit
-
-For a full held-out case audit, run:
-
-```bash
-python scripts/08_evaluate.py \
-  --num-clusters 100 \
-  --max-len 600 \
-  --save-predictions results/k100_test_predictions.jsonl
-```
-
-That JSONL contains `sample_id`, Tibetan/Mandarin text metadata, predicted units, reference units, unit edit distance, and normalized edit distance. Sorting by `normalized_unit_edit_distance` gives candidate "better" and "worse" examples. This command is slower on CPU because it autoregressively decodes the full test split.
+For a fuller qualitative audit workflow, including how to save per-example predictions and sort better/worse held-out cases, see [docs/CASE_ANALYSIS.md](docs/CASE_ANALYSIS.md).
 
 ## Reproducing the Main Experiment
 
@@ -316,7 +275,7 @@ More reproduction notes are in [docs/EXPERIMENT_GUIDE.md](docs/EXPERIMENT_GUIDE.
 
 ## What This Project Contributes
 
-This project touches three pillars of low-resource NLP and speech work.
+I see the contribution in three parts of low-resource NLP and speech work.
 
 Data:
 
@@ -349,8 +308,6 @@ Key limitations:
 - The model omits auxiliary ASR/ST/CTC objectives used by larger systems.
 - The final rendering stage is KNN retrieval plus Edge-TTS, not a trained unit vocoder.
 - The retrieval diagnostic shows clear semantic drift.
-
-These limitations are not side notes. They define the safe interpretation of the project.
 
 ## Conclusion
 

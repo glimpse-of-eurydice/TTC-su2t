@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="460" viewBox="0 0 1100 460" role="img" aria-labelledby="title desc">
+  <title id="title">Latin, Hangul, and Tibetan writing-system examples</title>
+  <desc id="desc">A comparison of Latin linear letters, Korean Hangul syllable blocks, and Tibetan syllable clusters with combining signs and syllable delimiters.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8f5f0; }
+      .card { fill: #ffffff; stroke: #d9dde3; stroke-width: 1.2; rx: 14; }
+      .latin { stroke: #4e8f7a; }
+      .hangul { stroke: #6f7fd0; }
+      .tibetan { stroke: #c48a3a; }
+      .title { font: 700 28px Arial, Helvetica, sans-serif; fill: #202a35; }
+      .subtitle { font: 400 15px Arial, Helvetica, sans-serif; fill: #5d6875; }
+      .label { font: 700 16px Arial, Helvetica, sans-serif; fill: #253040; }
+      .sample-latin { font: 700 58px Arial, Helvetica, sans-serif; fill: #1f2933; letter-spacing: 8px; }
+      .sample-hangul { font: 700 72px "Apple SD Gothic Neo", "Noto Sans CJK KR", Arial, sans-serif; fill: #1f2933; }
+      .sample-tibetan { font: 700 66px "Kailasa", "Noto Sans Tibetan", serif; fill: #1f2933; }
+      .code { font: 400 13px Menlo, Consolas, monospace; fill: #4c5967; }
+      .body { font: 400 14px Arial, Helvetica, sans-serif; fill: #4c5967; }
+      .note { font: 400 13px Arial, Helvetica, sans-serif; fill: #65717f; }
+      .chip { fill: #f2f5f7; stroke: #d4dae1; stroke-width: 1; rx: 8; }
+      .chiptext { font: 700 13px Arial, Helvetica, sans-serif; fill: #465260; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1100" height="460"/>
+  <text class="title" x="48" y="54">Why the Text Bridge Is Not Just a Simple Character Stream</text>
+  <text class="subtitle" x="48" y="80">These examples are simplified, but they show why ASR output is harder to normalize when speech must align to composed written forms.</text>
+
+  <rect class="card latin" x="50" y="120" width="310" height="262"/>
+  <text class="label" x="78" y="154">Latin letters</text>
+  <text class="sample-latin" x="96" y="228">cat</text>
+  <rect class="chip" x="78" y="257" width="54" height="32"/>
+  <rect class="chip" x="142" y="257" width="54" height="32"/>
+  <rect class="chip" x="206" y="257" width="54" height="32"/>
+  <text class="chiptext" x="98" y="278">c</text>
+  <text class="chiptext" x="162" y="278">a</text>
+  <text class="chiptext" x="226" y="278">t</text>
+  <text class="body" x="78" y="320">A mostly linear sequence</text>
+  <text class="body" x="78" y="339">of visible letters.</text>
+  <text class="note" x="78" y="363">This is the starting intuition for</text>
+  <text class="note" x="78" y="379">many letter-based readers.</text>
+
+  <rect class="card hangul" x="395" y="120" width="310" height="262"/>
+  <text class="label" x="423" y="154">Korean Hangul</text>
+  <text class="sample-hangul" x="506" y="226">한</text>
+  <rect class="chip" x="430" y="257" width="56" height="32"/>
+  <rect class="chip" x="496" y="257" width="56" height="32"/>
+  <rect class="chip" x="562" y="257" width="56" height="32"/>
+  <text class="chiptext" x="449" y="278">ㅎ</text>
+  <text class="chiptext" x="515" y="278">ㅏ</text>
+  <text class="chiptext" x="581" y="278">ㄴ</text>
+  <text class="body" x="423" y="320">Letters combine into a square</text>
+  <text class="body" x="423" y="339">syllable block.</text>
+  <text class="note" x="423" y="363">Modern Korean also has mature</text>
+  <text class="note" x="423" y="379">normalization and NLP tooling.</text>
+
+  <rect class="card tibetan" x="740" y="120" width="310" height="262"/>
+  <text class="label" x="768" y="154">Tibetan syllable cluster</text>
+  <text class="sample-tibetan" x="836" y="226">བོད་</text>
+  <rect class="chip" x="768" y="257" width="70" height="32"/>
+  <rect class="chip" x="848" y="257" width="70" height="32"/>
+  <rect class="chip" x="928" y="257" width="70" height="32"/>
+  <text class="chiptext" x="785" y="278">བ + ོ</text>
+  <text class="chiptext" x="873" y="278">ད</text>
+  <text class="chiptext" x="947" y="278">་</text>
+  <text class="body" x="768" y="320">A written syllable may include</text>
+  <text class="body" x="768" y="339">base letters, signs, suffixes,</text>
+  <text class="body" x="768" y="358">stacks, and a syllable delimiter.</text>
+
+  <text class="code" x="50" y="420">Takeaway: Unicode can represent Tibetan. The harder problem is robust speech-to-written alignment,</text>
+  <text class="code" x="50" y="440">normalization, and segmentation with limited data.</text>
+</svg>
