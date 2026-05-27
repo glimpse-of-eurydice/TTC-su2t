@@ -19,6 +19,7 @@
       .note { font: 400 13px Arial, Helvetica, sans-serif; fill: #65717f; }
       .chip { fill: #f2f5f7; stroke: #d4dae1; stroke-width: 1; rx: 8; }
       .chiptext { font: 700 13px Arial, Helvetica, sans-serif; fill: #465260; }
+      .gloss { font: 400 10px Arial, Helvetica, sans-serif; fill: #65717f; }
     </style>
   </defs>
 
@@ -43,29 +44,39 @@
   <rect class="card hangul" x="395" y="120" width="310" height="262"/>
   <text class="label" x="423" y="154">Korean Hangul</text>
   <text class="sample-hangul" x="506" y="226">한</text>
-  <rect class="chip" x="430" y="257" width="56" height="32"/>
-  <rect class="chip" x="496" y="257" width="56" height="32"/>
-  <rect class="chip" x="562" y="257" width="56" height="32"/>
-  <text class="chiptext" x="449" y="278">ㅎ</text>
-  <text class="chiptext" x="515" y="278">ㅏ</text>
-  <text class="chiptext" x="581" y="278">ㄴ</text>
-  <text class="body" x="423" y="320">Letters combine into a square</text>
-  <text class="body" x="423" y="339">syllable block.</text>
-  <text class="note" x="423" y="363">Modern Korean also has mature</text>
-  <text class="note" x="423" y="379">normalization and NLP tooling.</text>
+  <rect class="chip" x="428" y="252" width="62" height="46"/>
+  <rect class="chip" x="502" y="252" width="62" height="46"/>
+  <rect class="chip" x="576" y="252" width="62" height="46"/>
+  <text class="chiptext" x="450" y="271">ㅎ</text>
+  <text class="gloss" x="442" y="289">onset</text>
+  <text class="chiptext" x="525" y="271">ㅏ</text>
+  <text class="gloss" x="518" y="289">vowel</text>
+  <text class="chiptext" x="599" y="271">ㄴ</text>
+  <text class="gloss" x="590" y="289">final</text>
+  <text class="body" x="423" y="324">Example: 한 is composed of</text>
+  <text class="body" x="423" y="343">onset + vowel + final consonant.</text>
+  <text class="note" x="423" y="367">Modern Korean has mature</text>
+  <text class="note" x="423" y="383">normalization and NLP tooling.</text>
 
   <rect class="card tibetan" x="740" y="120" width="310" height="262"/>
   <text class="label" x="768" y="154">Tibetan syllable cluster</text>
   <text class="sample-tibetan" x="836" y="226">བོད་</text>
-  <rect class="chip" x="768" y="257" width="70" height="32"/>
-  <rect class="chip" x="848" y="257" width="70" height="32"/>
-  <rect class="chip" x="928" y="257" width="70" height="32"/>
-  <text class="chiptext" x="785" y="278">བ + ོ</text>
-  <text class="chiptext" x="873" y="278">ད</text>
-  <text class="chiptext" x="947" y="278">་</text>
-  <text class="body" x="768" y="320">A written syllable may include</text>
-  <text class="body" x="768" y="339">base letters, signs, suffixes,</text>
-  <text class="body" x="768" y="358">stacks, and a syllable delimiter.</text>
+  <rect class="chip" x="762" y="252" width="58" height="46"/>
+  <rect class="chip" x="830" y="252" width="58" height="46"/>
+  <rect class="chip" x="898" y="252" width="58" height="46"/>
+  <rect class="chip" x="966" y="252" width="58" height="46"/>
+  <text class="chiptext" x="782" y="271">བ</text>
+  <text class="gloss" x="774" y="289">onset</text>
+  <text class="chiptext" x="850" y="271">ོ</text>
+  <text class="gloss" x="844" y="289">vowel</text>
+  <text class="chiptext" x="919" y="271">ད</text>
+  <text class="gloss" x="911" y="289">final</text>
+  <text class="chiptext" x="987" y="271">་</text>
+  <text class="gloss" x="973" y="289">delimiter</text>
+  <text class="body" x="768" y="324">Example: བོད་ is often glossed</text>
+  <text class="body" x="768" y="343">as bod / "Tibet". Pronunciation</text>
+  <text class="body" x="768" y="362">varies by dialect; tone is not a</text>
+  <text class="body" x="768" y="381">separate written mark here.</text>
 
   <text class="code" x="50" y="420">Takeaway: Unicode can represent Tibetan. The harder problem is robust speech-to-written alignment,</text>
   <text class="code" x="50" y="440">normalization, and segmentation with limited data.</text>

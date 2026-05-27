@@ -1,5 +1,7 @@
 # Tibetan-to-Mandarin Speech-to-Unit Translation Prototype
 
+> My question is simple: can Tibetan speech be mapped toward Mandarin speech-like units without first building a full Tibetan ASR system?
+
 In this project, I ask a narrow question: can Tibetan source speech be mapped toward Mandarin-side acoustic units without first requiring a complete Tibetan automatic speech recognition system?
 
 The short answer is: partly. The system is a working, inspectable prototype. It builds data, extracts target-side units, trains a Transformer speech-to-unit model, evaluates unit predictions, and runs qualitative retrieval diagnostics. It also fails in important ways: even when the score looks acceptable, the model actually would fail to provide support real users. 
@@ -8,6 +10,8 @@ The main technical inspiration is Gong, Xu, and Zhao (2025), *Tibetan-Chinese sp
 
 ## Motivation
 
+> This is not just a benchmark problem. I frame it as an access problem, especially for Tibetan speakers trying to use Mandarin-speaking public services.
+
 Imagine an elderly Tibetan speaker from a remote pastoral area traveling to a large hospital in Chengdu. The hospital staff mostly speaks Mandarin. The patient may be able to describe pain, medication history, or symptoms in Tibetan, but the clinical interaction depends on a Mandarin-speaking system: reception, triage, payment, diagnosis, and follow-up instructions.
 
 This is not just a benchmark problem. It is an access problem. Speech technology can either reduce or intensify the distance between a marginalized speaker and a public service. A translation system in this setting must therefore be evaluated honestly. A fluent Mandarin sentence is not enough if it does not preserve the meaning of the Tibetan speech.
@@ -15,6 +19,8 @@ This is not just a benchmark problem. It is an access problem. Speech technology
 I therefore do not present this as a deployable medical interpreter. It is not a deployable medical interpreter. It is a small intervention that tests one idea: avoiding a fragile Tibetan text bottleneck by predicting Mandarin-side speech units.
 
 ## Why the Standard ASR-to-MT-to-TTS Pipeline Is Fragile
+
+> The usual pipeline is clean in theory, but fragile here because the first step already needs reliable Tibetan ASR.
 
 A conventional speech translation system usually works as a cascade:
 
@@ -26,15 +32,21 @@ This architecture is attractive because each component can be trained and evalua
 
 First, the pipeline depends on reliable Tibetan ASR. That is difficult when there is  dialectal diversity, limited transcribed speech, and a mismatch between spoken forms and standardized written forms. Errors at the ASR stage then propagate into translation and speech synthesis.
 
-Second, the writing system itself makes the text bridge more complex than a simple character stream. Tibetan is written in syllable units that may combine base letters, prefixes, suffixes, superscribed and subscribed consonants, vowel signs, and syllable delimiters. The practical challenge is not that Unicode cannot represent Tibetan text. It can. Rather, Tibetan text is typically encoded as sequences of letters and combining signs that must be rendered and processed as syllable stacks or grapheme clusters. This differs from modern Korean Hangul, where many commonly used syllable blocks have precomposed Unicode code points and mature normalization support. For Tibetan ASR and downstream NLP, the difficult part is obtaining stable conventions for normalization, tokenization, syllable segmentation, and spoken-to-written alignment. In better-resourced languages, these conventions are often supported by large corpora and mature tools. In this project setting, they are much thinner.
+![Writing-system examples for Latin, Hangul, and Tibetan](docs/assets/writing_system_examples.svg)
+
+Second, the writing system itself makes the text bridge more complex than a simple character stream. Tibetan is written in syllable units that may combine base letters, prefixes, suffixes, superscribed and subscribed consonants, vowel signs, and syllable delimiters. 
+> The practical challenge is not that Unicode cannot represent Tibetan text. It can. Rather, Tibetan text is typically encoded as sequences of letters and combining signs that must be rendered and processed as syllable stacks or grapheme clusters. 
+
+This differs from modern Korean Hangul, where many commonly used syllable blocks have precomposed Unicode code points and mature normalization support. For Tibetan ASR and downstream NLP, the difficult part is obtaining stable conventions for normalization, tokenization, syllable segmentation, and spoken-to-written alignment. In better-resourced languages, these conventions are often supported by large corpora and mature tools. In this project setting, they are much thinner.
 
 Hangul is also compositional, but modern Korean NLP usually benefits from stronger normalization, segmentation, and data support. Tibetan speech technology has fewer such resources, and the path from acoustic realization to standardized written Tibetan is less supported in practice. This makes an ASR-first cascade a risky dependency.
 
-![Writing-system examples for Latin, Hangul, and Tibetan](docs/assets/writing_system_examples.svg)
 
 Third, even if Tibetan ASR were available, a full speech-to-speech system would still need target-side speech generation. Unit-based speech-to-speech translation systems often train a unit vocoder to convert predicted acoustic units into waveforms. That is a separate data and compute burden. For a course project, a smaller prototype is more preferable to an overclaimed full system.
 
 ## Core Idea: Translate Speech Into Units, Not Tibetan Text
+
+> Instead of predicting Tibetan or Mandarin text, I predict Mandarin-side speech-like units.
 
 This project follows the speech-to-unit translation idea: instead of predicting Mandarin characters directly, the model predicts a target-side "acoustic alphabet."
 
@@ -55,6 +67,8 @@ This reframes the task. The source side remains speech. The target side becomes 
 ## Pipeline
 
 ![Tibetan-to-Mandarin speech-to-unit translation pipeline](docs/assets/s2ut_pipeline.svg)
+
+> Source side: Tibetan audio becomes log-Mel speech features. Target side: Mandarin text becomes synthetic speech, then HuBERT features, then K-means unit IDs. The model learns Tibetan speech features to Mandarin unit sequence.
 
 The figure shows the main design choice of the project: the model is trained from Tibetan source-speech features to Mandarin acoustic unit sequences, while the target units are built from Mandarin-side synthetic speech and HuBERT features.
 
@@ -134,6 +148,8 @@ This language model does not know Tibetan or Mandarin words. It only regularizes
 
 ## Results
 
+> The best number is K=100 with LM weight 0.6: 19.50 Unit-BLEU. I treat this as an improvement inside the experiment, not as proof of high-quality translation.
+
 The selected final system uses `K=100`. This matches the reference paper's reported HuBERT-base layer-6, `k=100` unit choice, but the numbers below are not directly comparable to the paper because this repo uses a smaller setup and reports Unit-BLEU over unit sequences.
 
 ### K Sweep
@@ -169,7 +185,7 @@ The shallow-fusion result improves over greedy decoding by `+7.40` Unit-BLEU.
 
 ![K=100 LM weight ablation](results/lm_weight_ablation.png)
 
-### ## How I Interpret the Score
+### How I Interpret the Score
 
 I treat `19.50` Unit-BLEU as a measurable improvement within this repo, not as evidence of high-quality translation. BLEU-style scores do not have a universal quality threshold, and Unit-BLEU is even harder to interpret because it measures overlap between discrete acoustic unit sequences rather than words or meanings.
 
@@ -178,6 +194,8 @@ A score near `20` suggests that the `K=100` + LM setting has learned more target
 That distinction matters for this project. The quantitative result is useful because it shows that the speech-to-unit pipeline can be trained and improved under limited resources. The qualitative analysis below is equally important because it shows why the same number is not enough for real use. In a medical-access setting, a locally plausible but semantically wrong Mandarin output is still a failure.
 
 ## Qualitative Analysis
+
+> he qualitative analysis is where the ethical point comes back: a better unit score can still produce semantically wrong Mandarin.
 
 Unit-BLEU is useful, but it is not semantic evaluation. A unit sequence can overlap with the reference more than another sequence while still failing to preserve meaning. For that reason, the retrieval diagnostics are necessary: they show that the model can obtain the best Unit-BLEU configuration while still mapping a test utterance toward Mandarin content that is semantically unrelated to the Tibetan source.
 
@@ -312,6 +330,8 @@ Key limitations:
 - The retrieval diagnostic shows clear semantic drift.
 
 ## Conclusion
+
+> **Speaking cue:** The takeaway is not that this solves Tibetan-to-Mandarin speech translation. The takeaway is that a small speech-to-unit prototype can be built, but honest evaluation shows why it is not deployable.
 
 The project began from an ethical and technical bottleneck: Tibetan speakers should not have to depend on high-resource Mandarin infrastructure to be understood in public-service settings, yet building reliable Tibetan ASR is itself difficult. A speech-to-unit approach offers a way to test translation without making Tibetan text generation the central dependency.
 
