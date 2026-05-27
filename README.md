@@ -46,9 +46,7 @@ Third, even if Tibetan ASR were available, a full speech-to-speech system would 
 
 ## Core Idea: Translate Speech Into Units, Not Tibetan Text
 
-> Instead of predicting Tibetan or Mandarin text, I predict Mandarin-side speech-like units.
-
-This project follows the speech-to-unit translation idea: instead of predicting Mandarin characters directly, the model predicts a target-side "acoustic alphabet."
+> This project follows the speech-to-unit translation idea: instead of predicting Mandarin characters directly, the model predicts a target-side "acoustic alphabet."
 
 The pipeline uses HuBERT, a self-supervised speech model, to turn Mandarin target speech into frame-level features. K-means clustering then converts those continuous features into discrete unit IDs. A Mandarin utterance becomes a sequence like:
 
@@ -195,9 +193,9 @@ That distinction matters for this project. The quantitative result is useful bec
 
 ## Qualitative Analysis
 
-> he qualitative analysis is where the ethical point comes back: a better unit score can still produce semantically wrong Mandarin.
+> Unit-BLEU is useful, but it is not semantic evaluation. A unit sequence can overlap with the reference more than another sequence while still failing to preserve meaning. 
 
-Unit-BLEU is useful, but it is not semantic evaluation. A unit sequence can overlap with the reference more than another sequence while still failing to preserve meaning. For that reason, the retrieval diagnostics are necessary: they show that the model can obtain the best Unit-BLEU configuration while still mapping a test utterance toward Mandarin content that is semantically unrelated to the Tibetan source.
+For that reason, the retrieval diagnostics are necessary: they show that the model can obtain the best Unit-BLEU configuration while still mapping a test utterance toward Mandarin content that is semantically unrelated to the Tibetan source.
 
 The diagnostic takes a predicted Mandarin unit sequence, finds the nearest training unit sequence by Levenshtein edit distance, and compares the retrieved Tibetan and Mandarin text. This is deliberately conservative: if the retrieved text is semantically unrelated, the model should not be presented as successful just because it produced a plausible unit sequence.
 
@@ -321,7 +319,6 @@ This prototype should not be used for real medical, legal, or public-service int
 
 Key limitations:
 
-- No human evaluation was run.
 - Unit-BLEU is not semantic adequacy.
 - The Mandarin target speech is synthesized, not naturally recorded.
 - The model does not use fine-tuned HuBERT.
@@ -331,7 +328,7 @@ Key limitations:
 
 ## Conclusion
 
-> **Speaking cue:** The takeaway is not that this solves Tibetan-to-Mandarin speech translation. The takeaway is that a small speech-to-unit prototype can be built, but honest evaluation shows why it is not deployable.
+> Traditional Tibetan-to-Mandarin speech translation depends on a Tibetan ASR system, which is difficult in this low-resource setting. I tried a unit-based alternative: mapping Tibetan speech features toward Mandarin acoustic units. The Unit-BLEU score improves through this pipeline, but the qualitative analysis is the main takeaway: a better score does not guarantee that the system can be used safely in real settings.
 
 The project began from an ethical and technical bottleneck: Tibetan speakers should not have to depend on high-resource Mandarin infrastructure to be understood in public-service settings, yet building reliable Tibetan ASR is itself difficult. A speech-to-unit approach offers a way to test translation without making Tibetan text generation the central dependency.
 
